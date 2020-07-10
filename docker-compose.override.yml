@@ -30,7 +30,6 @@ services:
     ports:
       - "40080:80"
       - "40443:443"
-      
   mijnapp-frontend:
     container_name: mijnapp-frontend
     environment:
@@ -40,6 +39,7 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/cert/test.pfx
       - ASPNETCORE_Kestrel__Certificates__Default__Password=MyPassword
       - PublicSettings__BACKEND_URL=http://localhost:40080
+      - PublicSettings__BACKEND_HOST=https://localhost:40080
       - PublicSettings__HAS_FAKE_INLOG_ENABLED=true
     ports:
       - "60080:80"
