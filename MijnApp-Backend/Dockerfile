@@ -17,5 +17,5 @@ RUN dotnet publish "MijnApp-Backend.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-COPY --from=publish /app/cert /cert
+COPY MijnApp-Backend/cert cert/
 ENTRYPOINT ["dotnet", "MijnApp-Backend.dll"]
