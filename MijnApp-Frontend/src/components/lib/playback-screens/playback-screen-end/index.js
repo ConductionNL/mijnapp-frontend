@@ -10,6 +10,7 @@ import { JOURNEY_START, JOURNEY_END, ORDER_STATUS_SENDING, ORDER_STATUS_SEND_OK,
 import css from './style.pcss';
 import template from './template.html';
 import '../../playback-screen-wrapper';
+import '../../../objects/maf-object-user-display';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 var moment = require('moment');
@@ -132,12 +133,20 @@ export default class PlaybackScreenEnd extends connect(store)(PolymerElement) {
         if (o.valueTitle.length > 0) {
           dataRow.push({ svg: this.dataUrlToSvg(question.fieldIcon), width: 15, height: 15 });
           dataRow.push({ text: o.keyTitle, style: 'question' });
-          dataRow.push({ text: o.valueTitle.filter(function(el) {return el != null && el != '';}).join('\n'), style: 'answer' });
+          var answerArrayText = o.valueTitle.filter(function(el) { return el != null && el != ''; }).join('\n');
+          if (o.warning !== null && o.warning !== undefined) {
+            answerArrayText = [answerArrayText + '\n', { text: o.warning, color: 'red' }];
+          }
+          dataRow.push({ text: answerArrayText, style: 'answer' });
         }
       } else {
         dataRow.push({ svg: this.dataUrlToSvg(question.fieldIcon), width: 15, height: 15 });
         dataRow.push({ text: o.keyTitle, style: 'question' });
-        dataRow.push({ text: o.valueTitle, style: 'answer' });
+        var answerText = o.valueTitle;
+        if (o.warning !== null && o.warning !== undefined) {
+          answerText = [answerText + '\n', { text: o.warning, color: 'red'}];
+        }
+        dataRow.push({ text: answerText, style: 'answer' });
       }
       body.push(dataRow);
     });
@@ -174,10 +183,20 @@ export default class PlaybackScreenEnd extends connect(store)(PolymerElement) {
       const question = this.questions.find(function(item) { return item.id === o.question; });
       if (Array.isArray(o.valueTitle)) {
         if (o.valueTitle.length > 0) {
-          returnable.push({ key: o.keyTitle, value: o.valueTitle.filter(function (el) { return el != null && el != ''; }).join('\n'), image: question.fieldIcon });
+          returnable.push({
+            key: o.keyTitle,
+            value: o.valueTitle.filter(function (el) { return el != null && el != ''; }).join('\n'),
+            image: question.fieldIcon,
+            warning: o.warning,
+          });
         }
       } else {
-        returnable.push({ key: o.keyTitle, value: o.valueTitle, image: question.fieldIcon });
+        returnable.push({
+          key: o.keyTitle,
+          value: o.valueTitle,
+          image: question.fieldIcon,
+          warning: o.warning,
+        });
       }
     });
     return returnable;

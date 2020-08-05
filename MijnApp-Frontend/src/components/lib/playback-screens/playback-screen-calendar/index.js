@@ -20,6 +20,13 @@ export default class PlaybackScreenCalendar extends connect(store)(
         notify: true,
         observer: '_datePickerValueChanged',
       },
+      daysInPastWarning: {
+        type: Number,
+      },
+      daysInFutureDisabled: {
+        type: Number,
+        observer: '_daysInFutureDisabledChanged',
+      },
     };
   }
 
@@ -31,6 +38,12 @@ export default class PlaybackScreenCalendar extends connect(store)(
     super();
     this.datepickerValueText = '';
     moment.locale('nl');
+    this.currentDateText = moment().format('D MMMM YYYY');
+    this.showDaysInPastWarningMessage = false;
+  }
+
+  _daysInFutureDisabledChanged() {
+    this.datepickerMaxDate = moment().add(this.daysInFutureDisabled, 'days').format('YYYY-MM-DD'); // ISO 8601 format
   }
 
   _title(question) {
@@ -39,15 +52,32 @@ export default class PlaybackScreenCalendar extends connect(store)(
 
   _datePickerValueChanged(data) {
     const question = this.question;
+    var warningMessage = '';
+
     if (data) {
-      this.datepickerValueText = moment(data, 'DD-MM-YYYY').format('D MMMM YYYY');
+      var selectedDate = moment(data, 'DD-MM-YYYY');
+      this.datepickerValueText = selectedDate.format('D MMMM YYYY');
+      var selectedDateWithDaysAdded = selectedDate.add(this.daysInPastWarning + 1, 'days');
+      // If the selected date + offset is before the current date, show the warning.
+      this.showDaysInPastWarningMessage = selectedDateWithDaysAdded.isBefore(moment());
+      if (this.showDaysInPastWarningMessage) {
+        warningMessage =
+          'Uw verhuizing was langer dan ' +
+          this.daysInPastWarning +
+          ' dagen geleden. De gemeente zal uw verhuisdatum aanpassen naar de datum van vandaag (' +
+          this.currentDateText +
+          ').';
+      }
     }
     store.dispatch(
       orderSaveAnswer(
         question.key || question.property,
         data,
         question.fieldName,
-        this.datepickerValueText
+        this.datepickerValueText,
+        null,
+        null,
+        warningMessage
       )
     );
   }

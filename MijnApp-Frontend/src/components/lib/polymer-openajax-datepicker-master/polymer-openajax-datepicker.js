@@ -1,4 +1,5 @@
 import { PolymerElement, html } from '@polymer/polymer/polymer-element';
+import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
 import { connect } from 'pwa-helpers/connect-mixin';
 import { store } from '../../../redux/store';
 var moment = require('moment');
@@ -70,6 +71,7 @@ export default class PolymerOpenajaxDatePicker extends connect(store)(PolymerEle
         type: String,
         value: '',
         notify: true,
+        observer: '_maxDateChanged',
       },
     };
   }
@@ -185,7 +187,7 @@ export default class PolymerOpenajaxDatePicker extends connect(store)(PolymerEle
 
   _initDateChanged(newInitDate, oldInitDate) {
     if (typeof oldInitDate !== 'undefined' && newInitDate !== oldInitDate) {
-      Polymer.RenderStatus.afterNextRender(this, function () {
+      afterNextRender(this, function () {
         this._unBindHandlers();
         this._unBindCellsClickHandlers();
         this._renderCalendar();
@@ -196,10 +198,19 @@ export default class PolymerOpenajaxDatePicker extends connect(store)(PolymerEle
   _minDateChanged(minDate) {
     if (minDate !== '') {
       this.minDateMoment = moment(minDate);
-      Polymer.RenderStatus.afterNextRender(this, function() {
+      afterNextRender(this, function() {
         this._checkDatesRange();
         this._updateAvailableDays();
       });
+    }
+  }
+  _maxDateChanged(maxDate) {
+    if (maxDate !== '') {
+      this.maxDateMoment = moment(maxDate);
+      afterNextRender(this, function() {
+          this._checkDatesRange();
+          this._updateAvailableDays();
+        });
     }
   }
 
@@ -510,11 +521,39 @@ export default class PolymerOpenajaxDatePicker extends connect(store)(PolymerEle
   }
 
   /**
+   * Checks if the selected date is inside the range of the min and max date. (Added by Solviteers)
+   * Prevents using the keyboard to select a date outside of the allowed range.
+   * @method _checkDateIsInsideRange
+   * @param (date) the moment date to check.
+   * @return (boolean) true if inside the range.
+   */
+  _checkDateIsInsideRange(dateToCheck) {
+    var check = true;
+    if (this.minDateMoment !== undefined) {
+      check = dateToCheck.isSameOrAfter(this.minDateMoment);
+    }
+    if (this.maxDateMoment !== undefined) {
+      check = check && dateToCheck.isSameOrBefore(this.maxDateMoment);
+    }
+    return check;
+  }
+
+  /**
     * It will set the selected date with format ISO 8601
     * @method _setSelectedDate
   * */
   _setSelectedDate(curDay) {
-    this.set('date', moment([this.year, this.month, curDay.innerText]).format('DD-MM-YYYY'));
+    var momentDate = moment([this.year, this.month, curDay.innerText]);
+    if (this._checkDateIsInsideRange(momentDate)) {
+      this.set('date', momentDate.format('DD-MM-YYYY'));
+
+      if (this.$grid !== null && this.$grid.querySelector('.selectedDay') !== null) {
+        if (this.$grid.querySelector('.selectedDay').classList.length > 0) {
+          this.$grid.querySelector('.selectedDay').classList.remove('selectedDay');
+        }
+      }
+      curDay.classList.add('selectedDay');
+    }
   }
 
   /**
@@ -742,7 +781,7 @@ export default class PolymerOpenajaxDatePicker extends connect(store)(PolymerEle
 
           $curDay.classList.remove('focus');
           $curDay.setAttribute('aria-selected', 'false');
-          $prevDay.classList.add('focus')
+          $prevDay.classList.add('focus');
           $prevDay.setAttribute('aria-selected', 'true');
 
           this.$grid.setAttribute('aria-activedescendant', $prevDay.getAttribute('id'));

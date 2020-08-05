@@ -57,10 +57,8 @@ export default class PlaybackScreenPersonsMoving extends connect(store)(PolymerE
     }
   }
 
-  selectAllPersons() {
-    for (let i = 0; i < this.persons.length; i++) {
-      this.set(`persons.${i}.selected`, true);
-    }
+  selectOnlyFirstPerson() {
+    this.set(`persons.${0}.selected`, true);
     this.saveSelectedPersons();
   }
 
@@ -153,7 +151,13 @@ export default class PlaybackScreenPersonsMoving extends connect(store)(PolymerE
       // const ids = selectedPersons.map(function (item) { return item.id; });
       const bsns = selectedPersons.map(function (item) { return item.burgerservicenummer; });
       const names = selectedPersons.map(function (item) { return self._formatPersonInformation(item); });
+      if (self.persons && self.persons.length === 1) {
+        bsns.push(self.persons[0].burgerservicenummer);
+        names.push(self._formatPersonInformation(self.persons[0]));
+      }
+
       store.dispatch({
+        type:'DoNothing',
         action1: store.dispatch(requestPersonsMovingSkipQuestion()),
         action2: store.dispatch(orderSaveAnswer(self.question.key || self.question.property, bsns, self.question.fieldName, names, self.question.property2, bsns)),
         action3: store.dispatch(orderSkip(self.current)),
@@ -161,7 +165,7 @@ export default class PlaybackScreenPersonsMoving extends connect(store)(PolymerE
       });
     }
     if (this.question.type === QUESTION_TYPE_PERSONS_MOVING && this.personsStatus === REQUEST_PERSONS_MOVING_SELECT_ALL) {
-      this.selectAllPersons();
+      this.selectOnlyFirstPerson();
     }
   }
 }

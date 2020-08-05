@@ -6,6 +6,7 @@ import { selectPage } from '../../../../redux/actions/application';
 import { requestJwtLogout } from '../../../../redux/actions/jwt';
 import { JOURNEY_START, JOURNEY_END } from '../../../../helpers/common';
 
+import '../../../objects/maf-object-user-display';
 import css from './style.pcss';
 import template from './template.html';
 
@@ -16,9 +17,10 @@ export default class PlaybackScreenStart extends connect(store)(
     return {
       preconditionsFullFilled: Boolean,
       preconditionsBeingChecked: Boolean,
+      preconditionsCheckFailed: Boolean,
     };
   }
-
+ 
   static get template() {
     return html([`<style>${css}</style> ${template}`]);
   }
@@ -92,6 +94,7 @@ export default class PlaybackScreenStart extends connect(store)(
     this.journey = state.journey;
     this.preconditionsFullFilled = state.journey.preconditionsFullFilled;
     this.preconditionsBeingChecked = state.journey.preconditionsBeingChecked;
+    this.preconditionsCheckFailed = state.journey.preconditionsCheckFailed;
     this.id =
       state.order.current === JOURNEY_START
         ? JOURNEY_START
