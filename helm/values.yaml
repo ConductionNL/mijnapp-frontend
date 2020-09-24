@@ -3,15 +3,27 @@
 # Declare variables to be passed into your templates.
 
 settings:
-  adresEndpoint: https://as.prod/
-  orderEndpoint: https://orc.prod/
-  brpEndpoint: https://brp.prod/
-  verzoekenEndpoint: https://vrc.prod/
-  verzoekTypeEndpoint: https://vtc.prod/
-  processTypeEndpoint: https://ptc.prod/
+  adresEndpoint: https://as.prod.svc.cluster.local/
+  orderEndpoint: https://orc.prod.svc.cluster.local/
+  brpEndpoint: https://brp.prod.svc.cluster.local/
+  verzoekenEndpoint: https://vrc.prod.svc.cluster.local/
+  verzoekTypeEndpoint: https://vtc.prod.svc.cluster.local/
+  processTypeEndpoint: https://ptc.prod.svc.cluster.local/
+  webResourceEndpoint: https://wrc.prod.svc.cluster.local/
   HasFakeLoginEnabled: true
   env: release
   domain: verhuizen.accp.s-hertogenbosch.nl
+
+security:
+  commonGroundKey: !changeMe!
+  contractKey: aaaaaaaa
+  digidCertPass: !changeMe!
+  digidCertPath: /path/to/cert.pfx
+  digidSharedSecret: !changeMe!
+  jwtKey: !changeMe!
+  jwtEncryptionKey: !changeMe!
+  defaultPass: !changeMe!
+
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

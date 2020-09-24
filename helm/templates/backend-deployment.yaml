@@ -40,7 +40,7 @@ spec:
             - name: ASPNETCORE_Kestrel__Certificates__Default__Path
               value: /app/cert/test.pfx
             - name: ORIGINS
-              value: https://verhuizen.accp.s-hertogenbosch.nl/mijnapp-backend/
+              value: https://{{ .Values.settings.domain }}
             - name: Jwt__Issuer
               valueFrom:
                 configMapKeyRef:
