@@ -13,16 +13,19 @@ settings:
   HasFakeLoginEnabled: true
   env: release
   domain: verhuizen.accp.s-hertogenbosch.nl
+  digidServer: https://alsiam.s-hertogenbosch.nl/aselectserver/server
+  digidServerName: alsiam.s-hertogenbosch.nl
+  digidApplicationId: Denbosch_Verhuizen
 
 security:
-  commonGroundKey: !changeMe!
+  commonGroundKey: '!changeMe!'
   contractKey: aaaaaaaa
-  digidCertPass: !changeMe!
+  digidCertPass: '!changeMe!'
   digidCertPath: /path/to/cert.pfx
-  digidSharedSecret: !changeMe!
-  jwtKey: !changeMe!
-  jwtEncryptionKey: !changeMe!
-  defaultPass: !changeMe!
+  digidSharedSecret: '!changeMe!'
+  jwtKey: '!changeMe!'
+  jwtEncryptionKey: '!changeMe!'
+  defaultPass: '!changeMe!'
 
 
 resources: {}
